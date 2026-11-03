@@ -1,0 +1,44 @@
+{
+  "dataset": {
+    "construction": "600 模板边界 + 100 真实需求改写 + 100 对抗注入",
+    "dev_overlap": 0,
+    "families": {
+      "conflict": 120,
+      "multi_hop": 120,
+      "overreach": 120,
+      "stale": 120,
+      "unanswerable": 120
+    },
+    "kinds": {
+      "adversarial_injection": 100,
+      "real_derived_paraphrase": 100,
+      "synthetic_boundary": 600
+    },
+    "lang": "zh-CN",
+    "n": 800,
+    "name": "support-qa-zh",
+    "scenario": "中文 RAG 客服问答",
+    "split": "test"
+  },
+  "files": {
+    "data/dev.frozen.jsonl": {
+      "bytes": 436685,
+      "n_lines": 300,
+      "sha256": "c642ee970424f0cc4b3eb7c0ac5be902c16f5064302b074445a7b27f135c95d7"
+    },
+    "data/test.frozen.jsonl": {
+      "bytes": 1306278,
+      "n_lines": 800,
+      "sha256": "8047deaa91efbf355876f025885ed47051c69367e9378585cf49ac53ebf42018"
+    },
+    "data/test.jsonl": {
+      "bytes": 1306278,
+      "n_lines": 800,
+      "sha256": "8047deaa91efbf355876f025885ed47051c69367e9378585cf49ac53ebf42018"
+    }
+  },
+  "freeze_rule": "data/test.frozen.jsonl 与 data/test.jsonl 字节相同且冻结后不得修改；冻结必须先于任何 rubric v1 运行；任何 rubric 改动必须在新测试集上验证，旧结论只作历史",
+  "frozen_utc": "2026-11-03T14:40:13+00:00",
+  "reproduce": "python3 scripts/make_test.py --seed 20261104 --out /tmp/test.jsonl && cmp data/test.jsonl /tmp/test.jsonl",
+  "schema_version": "1.0.0"
+}

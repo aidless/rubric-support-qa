@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
 runs/
-reports/
+reports/*
+!reports/disagreement.md
 /tmp/

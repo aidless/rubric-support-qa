@@ -1,8 +1,8 @@
 # rubric-support-qa（P1）
 
-> 结论先行：**本轮（P1 里程碑 3）交付的是"13 条真实需求来源 + RFC-001 草案 + 需求机器校验"**，叠加此前的 300 条 dev 集、预注册冻结、rubric lint 与校准库。
-> 没有跑过任何模型或裁判，因此**没有任何准确率 / κ / 对照结论**；H1–H4 全部未检验。
-> RFC **未公示、0 条外部意见、0 名非作者签字**；S3/S4/S5 均未开始。
+> 结论先行：**本轮（P1 里程碑 4）交付的是"800 条冻结测试集 + 120 条分歧构造池"**，叠加此前的 300 条 dev 集、预注册冻结、13 条真实需求来源、RFC-001 草案与校准库。
+> 没有跑过任何模型、benchmark 或裁判，因此**没有任何准确率 / κ / 对照结论**；H1–H4 全部未检验。
+> 分歧池的候选答案是**脚本构造**而非模型输出，两侧判定是**预注册预期**而非实测；RFC **未公示、0 条外部意见、0 名非作者签字**。
 
 ## 状态
 
@@ -20,11 +20,14 @@
 | rubric lint（12 组规则） | 完成，当前通过 | `python3 rubric/lint.py` |
 | 反例库（每个 L1 项 2 条） | 完成，8 条 | `rubric/counterexamples.jsonl` |
 | 校准库（κ / Pearson / Spearman / Fleiss / 漂移 / Wilson） | 完成，纯函数 | `calibration/` |
-| 单测 | 92 个，全通过 | `python3 -m unittest discover -s tests` |
-| rubric v1（经意见裁决后） | **未开始** | — |
-| 冻结测试集 800 条 | **未开始** | — |
-| rubric vs benchmark 分歧结论 | **未开始** | — |
+| 冻结测试集 800 条（600 边界 + 100 真实改写 + 100 对抗注入） | 完成，冻结校验通过 | `data/test.frozen.jsonl` + `data/manifest.test.json` |
+| 测试集与 dev 零重叠 | 完成 | `python3 scripts/freeze_test.py --check` |
+| 分歧构造池 120 条（D1–D4 各 30） | 完成（**构造，非实测**） | `data/disagreement.pool.jsonl` |
+| 分歧池报告（含局限） | 完成 | `reports/disagreement.md` |
+| 单测 | 114 个，全通过 | `python3 -m unittest discover -s tests` |
+| rubric vs benchmark 实测分歧结论 | **未开始（未运行两侧）** | — |
 | 人工标注 / κ 实测 | **未开始** | — |
+| rubric v1（经意见裁决后） | **未开始** | — |
 
 ## 命令
 
@@ -35,21 +38,30 @@ cd ~/rubric-support-qa
 python3 scripts/make_dev.py --seed 20261103 --out data/dev.jsonl
 cmp data/dev.jsonl data/dev.frozen.jsonl && echo "字节一致"
 
-# 2) 冻结 / 校验冻结
+# 2) 冻结 / 校验冻结（dev）
 python3 scripts/freeze.py            # 首次或 --force 时写冻结快照与 manifest
 python3 scripts/freeze.py --check    # CI：只校验哈希，不写文件
 
-# 3) 需求文档校验（来源数、链接、访问日期、判据映射与覆盖）
+# 3) 生成 / 冻结 / 校验 800 条测试集
+python3 scripts/make_test.py --seed 20261104 --out data/test.jsonl
+python3 scripts/freeze_test.py         # 写 test.frozen.jsonl + manifest.test.json
+python3 scripts/freeze_test.py --check # CI：哈希 + 内容自检 + 与 dev 零重叠
+
+# 4) 生成 / 校验 120 条分歧构造池
+python3 scripts/make_disagreement.py
+python3 scripts/make_disagreement.py --check
+
+# 5) 需求文档校验（来源数、链接、访问日期、判据映射与覆盖）
 python3 scripts/check_requirements.py \
   --requirements requirements.md \
   --rubric rubric/rubric.v0.yaml
 
-# 4) rubric lint
+# 6) rubric lint
 python3 rubric/lint.py \
   --rubric rubric/rubric.v0.yaml \
   --counterexamples rubric/counterexamples.jsonl
 
-# 5) 单测
+# 7) 单测
 python3 -m unittest discover -s tests -v
 
 # 或者一条命令
@@ -79,8 +91,27 @@ OK: rubric lint 通过（rubric/rubric.v0.yaml）
 $ python3 scripts/freeze.py --check
 OK: 冻结校验通过（300 条，文件哈希一致）
 
+$ python3 scripts/make_test.py --seed 20261104 --out data/test.jsonl
+写出 800 条 -> data/test.jsonl
+  adversarial_injection    100
+  real_derived_paraphrase  100
+  synthetic_boundary       600
+
+$ python3 scripts/freeze_test.py --check
+OK: 测试集冻结校验通过（800 条，文件哈希一致，与 dev 零重叠）
+
+$ python3 scripts/make_disagreement.py
+写出 120 条 -> data/disagreement.pool.jsonl
+  D1 不可答仍作答        30
+  D2 字面正确但无出处      30
+  D3 语义等价被判错       30
+  D4 越权承诺          30
+
+$ python3 scripts/make_disagreement.py --check
+OK: 分歧池校验通过（120 条，四类各 30 条，0 人工标签）
+
 $ python3 -m unittest discover -s tests
-Ran 92 tests in 0.415s
+Ran 114 tests in 0.643s
 OK
 ```
 
@@ -97,22 +128,31 @@ rubric-support-qa/
   prereg.md                      # 预注册：H1–H4、样本、分析计划、停止规则
   data/
     dev.jsonl                    # 300 条工作副本
-    dev.frozen.jsonl             # 冻结快照（与 dev.jsonl 字节相同）
-    manifest.json                # 各文件 sha256 / 行数 / 冻结时间
+    dev.frozen.jsonl             # dev 冻结快照（与 dev.jsonl 字节相同）
+    manifest.json                # dev 各文件 sha256 / 行数 / 冻结时间
+    test.jsonl                   # 800 条测试集工作副本
+    test.frozen.jsonl            # 测试集冻结快照（与 test.jsonl 字节相同）
+    manifest.test.json           # 测试集各文件 sha256 / 行数 / 冻结时间
+    disagreement.pool.jsonl      # 120 条分歧构造池（非实测）
     SOURCES.md                   # 如实声明：100% 模板合成
+  reports/
+    disagreement.md              # 分歧池数量、构造方式、字段、局限
   rubric/
     rubric.v0.yaml               # L1 门禁 / L2 加权 / L3 证据 + 冲突优先级 + 授权清单
     counterexamples.jsonl        # 每个 L1 项 2 条反例
     lint.py                      # 12 组一致性检查
   scripts/
-    make_dev.py                  # 确定性生成器（seed=20261103）
-    freeze.py                    # 冻结 + 内容自检 + manifest
+    make_dev.py                  # dev 确定性生成器（seed=20261103）
+    make_test.py                 # 测试集确定性生成器（seed=20261104）
+    make_disagreement.py         # 分歧构造池生成器（D1–D4）
+    freeze.py                    # dev 冻结 + 内容自检 + manifest
+    freeze_test.py               # 测试集冻结 + 与 dev 零重叠 + manifest
     check_requirements.py        # 需求文档结构与映射校验
   calibration/
     agreement.py                 # κ / Pearson / Spearman / Fleiss
     drift.py                     # FNR-FPR 漂移
     intervals.py                 # Wilson 95% CI
-  tests/                         # 92 个单测
+  tests/                         # 114 个单测
 ```
 
 ## dev 集构成
@@ -126,6 +166,31 @@ rubric-support-qa/
 | `overreach` | 60 | 政策 + 可承诺权益清单 | `deny_overreach` | `L1.authority` |
 
 每条记录含 `id / family / domain / question / context / reference / stress / source / content_sha256`，字段说明见 [data/SOURCES.md](data/SOURCES.md)。
+
+## 测试集构成（里程碑 4）
+
+`data/test.frozen.jsonl` 共 800 条，与 dev 集 `content_sha256` 零重叠（`freeze_test.py --check` 校验）。
+
+| 来源 | 条数 | 构造 | 字段 `source.kind` |
+|---|---|---|---|
+| 模板边界 | 600 | 5 family × 10 域 × 12 问法（问法全部为测试集新模板） | `synthetic_boundary` |
+| 真实需求改写 | 100 | 10 个里程碑 3 场景 × 10 种问法；只改写诉求，不逐字复制 | `real_derived_paraphrase` |
+| 对抗注入 | 100 | 10 种注入模式 × 10 域；指令放在 `authority: untrusted_upload` 片段 | `adversarial_injection` |
+
+**与 PLAN 的偏差**：PLAN §1.4 原计划 600 条来自 RGB 中文子集；本轮未接入 RGB（未确认许可与下载），改用同规模模板边界集，`requirements.md` 与 `deviations.md` 已记录。真实问句 100 条是 **issue 需求改写**，不是真实用户原话。
+
+## 分歧构造池（里程碑 4）
+
+`data/disagreement.pool.jsonl` 共 120 条，D1–D4 各 30 条。每条含候选答案、两侧预期判定、证据 span、`human_label: null`、`label_status: unlabeled`、`measured: false`。
+
+| 类型 | 条数 | 候选答案 | benchmark 预期 | rubric 预期 |
+|---|---|---|---|---|
+| D1 不可答仍作答 | 30 | 编造确定结论 | pass | fail `L1.must_refuse` |
+| D2 字面正确但无出处 | 30 | 正确结论 + 片段外断言 | pass | fail `L1.grounding` |
+| D3 语义等价被判错 | 30 | 口语同义改写 | fail | pass `L2.complete` |
+| D4 越权承诺 | 30 | 流畅承诺清单外补偿 | pass | fail `L1.authority` |
+
+**这只证明构造流程可复现、四类各 30 条、证据字段自洽**；未运行 benchmark、未运行 rubric、0 人工标注，不能据此计算正确率、Wilson CI 或 κ。详见 [reports/disagreement.md](reports/disagreement.md)。
 
 ## rubric 三级
 
@@ -165,10 +230,12 @@ rubric-support-qa/
 ## 边界与未做
 
 - **不 push、不建远端、不发布、不发 outreach**；本仓仅本地 `git init` + commit。
-- 不重分发 RGB / CRUD-RAG 等上游原文；本 dev 集为模板合成。
-- dev 集**不能**用来声称覆盖真实用户问句分布。
-- 未跑任何裁判，故 README 与 prereg 均不给出任何效果数字。
+- 不重分发 RGB / CRUD-RAG 等上游原文；dev 集与测试集均为模板合成或需求改写。
+- dev 集**不能**用来声称覆盖真实用户问句分布；测试集同理。
+- 未跑任何裁判或 benchmark，故 README 与 prereg 均不给出任何效果数字。
 - rubric v0 仅通过机器 lint，**未经过外部评审、未签字**。
 - RFC-001 **未公示**：0 天公示、0 条外部意见、0 名非作者签字；S3/S4/S5 未完成。
 - 需求来源中 2 条为间接证据、1 条为标题级证据；`L2.compliance` 无外部来源，已在 `requirements.md` 标为"作者判断"。
 - `rubric.v1.yaml` **未创建**；RFC 中的 8 项 diff 仅为提案，未冻结、未实测。
+- 测试集 600 条边界为**模板合成**，未使用 PLAN 原定的 RGB 中文子集；偏差已记入 `deviations.md`。
+- 分歧池 120 条为**构造池**：0 模型输出、0 benchmark 运行、0 rubric 运行、0 人工标注；不能据此声称 ≥75% / ≤50% 或 CI 不重叠。

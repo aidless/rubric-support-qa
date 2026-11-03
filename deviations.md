@@ -1,7 +1,7 @@
 # 偏差日志（deviations）
 
-> 结论先行：**本轮只新增里程碑 3 的文档与校验脚本，未修改任何已冻结文件。**
-> S2 公示、S3 意见裁决、S4 签字、S5 判定翻转**均未完成**；本文件如实记录偏差与原因。
+> 结论先行：**本轮新增里程碑 4 的测试集与分歧构造池，未修改任何已冻结文件。**
+> 分歧池两侧判定为预期值，**未运行 benchmark、未运行 rubric、0 人工标注**；S2 公示、S3 意见裁决、S4 签字、S5 判定翻转均未完成。
 
 ## 1. 冻结边界
 
@@ -67,3 +67,27 @@ python3 -m unittest discover -s tests
 | 日期 | 变更 | 影响 |
 |---|---|---|
 | 2026-11-03 | 新增 requirements / RFC-001 / decisions / SIGNOFF / 本文件 / 校验脚本 | 冻结文件零改动；S2–S5 未完成 |
+| 2026-11-03 | 新增 800 条测试集、120 条分歧构造池、对应生成器与报告 | 冻结文件零改动；新增独立 `data/manifest.test.json` |
+
+## 7. 里程碑 4 偏差
+
+**冻结边界**：`data/manifest.json` 覆盖的 6 个文件（`prereg.md`、`data/dev.jsonl`、`data/dev.frozen.jsonl`、`data/SOURCES.md`、`rubric/rubric.v0.yaml`、`rubric/counterexamples.jsonl`）全部未修改；测试集使用独立 `data/manifest.test.json`，不覆盖旧 manifest。
+
+| 编号 | PLAN 要求 | 实际 | 原因 | 影响 |
+|---|---|---|---|---|
+| D6-01 | 测试集 600 条来自 RGB 中文子集（negative rejection / counterfactual / integration 各 200） | 600 条为 `synthetic_boundary`（5 family × 10 域 × 12 问法） | 未确认 RGB 下载与重分发许可，且未接入官方评分器 | 测试规模达标（800），但与现成 benchmark 的"同分布对照"不成立；报告中不得写"RGB 测试集" |
+| D6-02 | 真实用户问句 100 条（issue/FAQ 脱敏） | 100 条为里程碑 3 issue 需求的改写问法 | 无法获取真实用户原话；只用公开 issue 诉求做模板 | 可证明"问题来自真实需求"，不能声称"真实用户问句分布" |
+| D6-03 | 分歧池需 benchmark 与 rubric 实际判定不一致 | 120 条为构造池，两侧判定按 PLAN §1.5 预期填写 | 未接入 benchmark、未创建且未运行 rubric v1 | 只满足"数量 ≥120、四类各 ≥15"；H1 仍未检验 |
+| D6-04 | 3 人盲标 + 负控制 + Wilson CI + Fleiss κ | 0 标注、0 CI、0 κ | 标注预算与外部人员未落实 | 分歧池无人工标签；`human_label` 全为 null |
+| D6-05 | 分歧池冻结后不得再改 | 当前为可重建的 `disagreement.pool.jsonl`，未冻结 | 标注开始前仍需修正构造 | 报告已声明"池未冻结"；标注前须新建 `disagreement.frozen.jsonl` |
+
+## 8. 里程碑 4 复核命令
+
+```bash
+cd ~/rubric-support-qa
+python3 scripts/freeze_test.py --check
+python3 scripts/make_disagreement.py --check
+python3 -m unittest discover -s tests
+```
+
+前两项通过只代表测试集哈希一致、与 dev 零重叠、分歧池结构与证据自洽；**不代表 benchmark 或 rubric 真的判错/判对**。
