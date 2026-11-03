@@ -1,0 +1,53 @@
+{
+  "dataset": {
+    "construction": "synthetic_template",
+    "families": {
+      "conflict": 60,
+      "multi_hop": 60,
+      "overreach": 60,
+      "stale": 60,
+      "unanswerable": 60
+    },
+    "lang": "zh-CN",
+    "n": 300,
+    "name": "support-qa-zh",
+    "scenario": "中文 RAG 客服问答",
+    "split": "dev"
+  },
+  "files": {
+    "data/SOURCES.md": {
+      "bytes": 2300,
+      "n_lines": null,
+      "sha256": "88de90bf273266dcad3b86e1b43d575d0aacf9208435ec18f432bc64bf108ae2"
+    },
+    "data/dev.frozen.jsonl": {
+      "bytes": 436685,
+      "n_lines": 300,
+      "sha256": "c642ee970424f0cc4b3eb7c0ac5be902c16f5064302b074445a7b27f135c95d7"
+    },
+    "data/dev.jsonl": {
+      "bytes": 436685,
+      "n_lines": 300,
+      "sha256": "c642ee970424f0cc4b3eb7c0ac5be902c16f5064302b074445a7b27f135c95d7"
+    },
+    "prereg.md": {
+      "bytes": 6307,
+      "n_lines": null,
+      "sha256": "97a86a468991d537dc0192d5739dd621db514f3e911c0f5e6e24decfc1071686"
+    },
+    "rubric/counterexamples.jsonl": {
+      "bytes": 1904,
+      "n_lines": 8,
+      "sha256": "76cbef73fd5bec852dcba13d00eec26217709771096977798ec9cdced708b316"
+    },
+    "rubric/rubric.v0.yaml": {
+      "bytes": 4549,
+      "n_lines": null,
+      "sha256": "0f32804d95586d046425cbd37247a99b201ed90f09eb2b846fb46e8a95d61339"
+    }
+  },
+  "freeze_rule": "data/dev.frozen.jsonl 与 data/dev.jsonl 字节相同且冻结后不得修改；任何 rubric 改动必须在新数据集上验证，旧结论只作历史",
+  "frozen_utc": "2026-11-03T12:20:52+00:00",
+  "reproduce": "python3 scripts/make_dev.py --seed 20261103 --out /tmp/dev.jsonl && cmp data/dev.jsonl /tmp/dev.jsonl",
+  "schema_version": "1.0.0"
+}
