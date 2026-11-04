@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: rubric lint
+        run: python3 rubric/lint.py
+      - name: requirements check
+        run: python3 scripts/check_requirements.py
+      - name: dev set freeze check
+        run: python3 scripts/freeze.py --check
+      - name: test set freeze check
+        run: python3 scripts/freeze_test.py --check

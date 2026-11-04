@@ -218,18 +218,18 @@ rubric-support-qa/
 
 | 复用内容 | 来源 | 落点 |
 |---|---|---|
-| `kappa` / `pearson` / `spearman` 与门禁阈值 | `/home/liuzewen/gh-publication-audit-20261029/judge-calibration-api/human_gold_consistency.py` | `calibration/agreement.py` |
-| `compute_fnr_fpr` / `load_baseline` / `check_drift` 与 0.05 阈值 | `/home/liuzewen/gh-publication-audit-20261029/judge-calibration-api/calibration_monitor.py` | `calibration/drift.py` |
-| Wilson 95% CI | `/home/liuzewen/eval-gate/eval_gate/stats.py`（P2 产物） | `calibration/intervals.py` |
+| `kappa` / `pearson` / `spearman` 与门禁阈值 | judge-calibration 仓 `human_gold_consistency.py` | `calibration/agreement.py` |
+| `compute_fnr_fpr` / `load_baseline` / `check_drift` 与 0.05 阈值 | judge-calibration 仓 `calibration_monitor.py` | `calibration/drift.py` |
+| Wilson 95% CI | eval-gate 仓 `eval_gate/stats.py`（P2 产物） | `calibration/intervals.py` |
 
 改造（而非照搬）：
-- 原两个脚本都是"CLI + 硬编码路径 + 绑定 `judge_run`"；这里全部抽成纯函数，不读 `F:\...`，不调模型。
+- 原两个脚本都是"CLI + 硬编码路径 + 绑定 `judge_run`"；这里全部抽成纯函数，不读本机绝对路径，不调模型。
 - `fleiss_kappa` 为新增（原仓没有），用于预注册 H3 的三家裁判一致性。
 - 原文的"连续两次漂移 → UNCALIBRATED"改成 `consecutive_drift_state(history)`，把状态交给调用方。
 
 ## 边界与未做
 
-- **不 push、不建远端、不发布、不发 outreach**；本仓仅本地 `git init` + commit。
+- **不发布 PyPI、不发 outreach**；仓库仅开源代码与数据，未做任何对外推广。
 - 不重分发 RGB / CRUD-RAG 等上游原文；dev 集与测试集均为模板合成或需求改写。
 - dev 集**不能**用来声称覆盖真实用户问句分布；测试集同理。
 - 未跑任何裁判或 benchmark，故 README 与 prereg 均不给出任何效果数字。
