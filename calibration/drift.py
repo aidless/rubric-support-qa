@@ -1,10 +1,10 @@
 """judge 校准漂移检测（纯库函数）。
 
 原始路径（只读复用）：
-    /home/liuzewen/gh-publication-audit-20261029/judge-calibration-api/calibration_monitor.py
+    judge-calibration-api/calibration_monitor.py（本地私有仓，未公开）
 
 与原文的差异：
-  1. 原文硬编码 `SCHED = Path(r"F:\\deepseek\\research-kit\\scheduler")`，并直接
+  1. 原文硬编码一个本机绝对路径 `SCHED = Path(...)`，并直接
      `from judge_run import judge_one`；这里两者都删掉，本模块不碰模型、不碰文件系统。
   2. 原文 `--check` / `--selftest` 模式改成调用方驱动：本模块只提供
      `compute_fnr_fpr` / `load_baseline` / `check_drift`。

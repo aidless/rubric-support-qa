@@ -1,7 +1,7 @@
 """人机一致性：Cohen κ、Pearson、Spearman、Fleiss κ。
 
 原始路径（只读复用，未复制原仓其它部分）：
-    /home/liuzewen/gh-publication-audit-20261029/judge-calibration-api/human_gold_consistency.py
+    judge-calibration-api/human_gold_consistency.py（本地私有仓，未公开）
 
 与原文的差异：
   1. 原文把计算与 argparse/文件写出耦合在一个 `main()` 里；这里拆成纯函数，

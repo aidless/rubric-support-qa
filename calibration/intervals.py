@@ -1,7 +1,7 @@
 """Wilson 95% 置信区间。
 
 原始路径（只读复用）：
-    /home/liuzewen/eval-gate/eval_gate/stats.py
+    eval-gate/eval_gate/stats.py（公开仓 aidless/eval-gate）
     （该实现本身由本项目 P2 落地，P1 这里按同一公式复用，避免两处口径不一致）
 
 约定：n <= 0 时返回全程区间 (0.0, 1.0)，不伪造点估计。
