@@ -52,7 +52,7 @@ D3 的改写只做两类操作：口语同义替换（`不支持`→`不行`、`
 ## 4. 复算与校验
 
 ```bash
-cd ~/rubric-support-qa
+git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
 
 # 从冻结测试集重建分歧池（确定性）
 python3 scripts/make_disagreement.py --out /tmp/pool.jsonl

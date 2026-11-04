@@ -132,7 +132,7 @@ S5 的门槛（PLAN §1.2）：**≥10 条判定翻转，或某维度 κ 提升 
 ## 8. 本 RFC 的机器校验
 
 ```bash
-cd ~/rubric-support-qa
+git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
 python3 scripts/check_requirements.py \
   --requirements requirements.md \
   --rubric rubric/rubric.v0.yaml

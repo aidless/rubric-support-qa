@@ -32,7 +32,8 @@
 ## 命令
 
 ```bash
-cd ~/rubric-support-qa
+git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
+python3 -m pip install pyyaml   # 唯一第三方依赖，仅需求校验与 rubric lint 使用
 
 # 1) 重新生成 dev 集（确定性，必须与已冻结文件逐字节一致）
 python3 scripts/make_dev.py --seed 20261103 --out data/dev.jsonl
@@ -68,7 +69,7 @@ python3 -m unittest discover -s tests -v
 make check
 ```
 
-实测输出（本机，Python 3.12）：
+实测输出（干净 clone + 全新 venv，Python 3.12）：
 
 ```
 $ python3 scripts/make_dev.py --seed 20261103 --out data/dev.jsonl

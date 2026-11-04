@@ -53,7 +53,7 @@
 ## 5. 复核命令
 
 ```bash
-cd ~/rubric-support-qa
+git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
 python3 scripts/check_requirements.py --requirements requirements.md --rubric rubric/rubric.v0.yaml
 python3 rubric/lint.py --rubric rubric/rubric.v0.yaml --counterexamples rubric/counterexamples.jsonl
 python3 scripts/freeze.py --check
@@ -84,7 +84,7 @@ python3 -m unittest discover -s tests
 ## 8. 里程碑 4 复核命令
 
 ```bash
-cd ~/rubric-support-qa
+git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
 python3 scripts/freeze_test.py --check
 python3 scripts/make_disagreement.py --check
 python3 -m unittest discover -s tests
