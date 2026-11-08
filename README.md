@@ -33,7 +33,7 @@
 
 ```bash
 git clone https://github.com/aidless/rubric-support-qa.git && cd rubric-support-qa
-python3 -m pip install pyyaml   # 唯一第三方依赖，仅需求校验与 rubric lint 使用
+python3 -m pip install -r requirements.txt   # 唯一第三方依赖 PyYAML（已钉版本），仅需求校验与 rubric lint 使用
 
 # 1) 重新生成 dev 集（确定性，必须与已冻结文件逐字节一致）
 python3 scripts/make_dev.py --seed 20261103 --out data/dev.jsonl

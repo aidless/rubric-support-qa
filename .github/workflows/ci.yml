@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: install test dependencies
-        run: python3 -m pip install pyyaml
+      - name: install test dependencies (pinned)
+        run: python3 -m pip install -r requirements.txt
       - name: unit tests
         run: python3 -m unittest discover -s tests -v
       - name: rubric lint
