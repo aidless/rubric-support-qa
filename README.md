@@ -1,5 +1,7 @@
 # rubric-support-qa（P1）
 
+[![CI](https://github.com/aidless/rubric-support-qa/actions/workflows/ci.yml/badge.svg)](https://github.com/aidless/rubric-support-qa/actions/workflows/ci.yml)
+
 > 结论先行：**本轮（P1 里程碑 4）交付的是"800 条冻结测试集 + 120 条分歧构造池"**，叠加此前的 300 条 dev 集、预注册冻结、13 条真实需求来源、RFC-001 草案与校准库。
 > 没有跑过任何模型、benchmark 或裁判，因此**没有任何准确率 / κ / 对照结论**；H1–H4 全部未检验。
 > 分歧池的候选答案是**脚本构造**而非模型输出，两侧判定是**预注册预期**而非实测；RFC **未公示、0 条外部意见、0 名非作者签字**。
