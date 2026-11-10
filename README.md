@@ -118,6 +118,27 @@ Ran 114 tests in 0.643s
 OK
 ```
 
+## Results（冻结校验实测数字）
+
+以下数字全部来自仓库内冻结文件 + 本仓脚本的机器校验（2026-11-10 复跑，干净 working tree）：
+
+| 项 | 实测数字 | 校验命令 | 输出 |
+|---|---|---|---|
+| dev 冻结集 | 300 条，文件哈希一致 | `python3 scripts/freeze.py --check` | `OK: 冻结校验通过（300 条，文件哈希一致）` |
+| 测试冻结集 | 800 条，哈希一致，与 dev 零重叠 | `python3 scripts/freeze_test.py --check` | `OK: 测试集冻结校验通过（800 条…与 dev 零重叠）` |
+| 分歧构造池 | 120 条（D1–D4 各 30），0 人工标签 | `python3 scripts/make_disagreement.py --check` | `OK: 分歧池校验通过（120 条…0 人工标签）` |
+| 需求机器校验 | 3 项目 / 13 条约束 | `python3 scripts/check_requirements.py` | `OK: 需求校验通过（3 个项目 / 13 条约束）` |
+| rubric lint | 12 组规则全部通过 | `python3 rubric/lint.py` | `OK: rubric lint 通过` |
+| dev 确定性再生成 | 与冻结文件逐字节一致 | `make_dev.py --seed 20261103` + `cmp` | `dev regen byte-identical` |
+| 单测 | **114 个，0.645s，全通过** | `python3 -m unittest discover -s tests` | `Ran 114 tests in 0.645s / OK` |
+
+## Limits
+
+- **model-judge κ 未测**：`calibration/` 的 κ / Pearson / Spearman / Fleiss / 漂移 / Wilson 全部是**纯函数 + 单测覆盖**（114 个测试验证函数行为），但从未被喂入真实裁判输出——预注册的 H1–H4（含裁判一致性）一个都没检验，无任何实测 κ 数字。
+- 分歧池 120 条是脚本构造 + 预注册预期，非模型实测；不能据此计算正确率、CI 或 κ。
+- RFC-001 未公示（0 条外部意见、0 名非作者签字）；rubric v1 未创建。
+- dev/测试集均为模板合成或需求改写，不声称覆盖真实用户问句分布。
+
 ## 目录
 
 ```
